@@ -1,0 +1,113 @@
+/* TRUE CHESS — floating decorations. Complete add-on stylesheet. */
+#tabletop-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 14;
+    pointer-events: none;
+}
+.tabletop-item {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+    min-height: 80px;
+    color: var(--text-color, #eee4c9);
+    background: var(--text-background, #292929);
+    border: 1px solid #e4d39d80;
+    box-shadow: 3px 5px 14px #0007;
+    pointer-events: auto;
+}
+.tabletop-handle {
+    display: flex;
+    flex: 0 0 28px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 28px;
+    padding: 2px 4px 2px 8px;
+    color: #eee4c9;
+    background: #292929d9;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+.tabletop-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+}
+.tabletop-handle nav { display: flex; gap: 3px; flex: none; }
+.tabletop-handle button {
+    padding: 1px 5px;
+    font-size: 13px;
+    line-height: 18px;
+}
+.tabletop-text {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    padding: 10px 12px 18px;
+    resize: none;
+    color: var(--text-color, #eee4c9);
+    background: transparent;
+    border: 0;
+    font-family: inherit;
+    font-size: var(--text-size, 18px);
+    line-height: 1.45;
+}
+.tabletop-text:focus-visible { outline-offset: -3px; }
+.tabletop-art {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+.tabletop-resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    color: #e4d39d;
+    background: #292929b0;
+    border: 0;
+    box-shadow: none;
+    cursor: nwse-resize;
+    touch-action: none;
+}
+.transparent-prop {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+.transparent-prop .tabletop-handle,
+.transparent-prop .tabletop-resize { opacity: .3; }
+.transparent-prop:hover .tabletop-handle,
+.transparent-prop:focus-within .tabletop-handle,
+.transparent-prop:hover .tabletop-resize { opacity: 1; }
+.tabletop-cycle-help {
+    margin-top: 14px;
+    padding: 10px;
+    color: #d7c78f;
+    background: #141414;
+    border: 1px solid #e4d39d44;
+    font-size: 11px;
+    line-height: 1.7;
+}
+#prop-canvas { margin-top: 12px; max-height: 340px; }
+@media (max-width: 650px) {
+    .top-actions { gap: 3px; }
+    .top-actions button { padding: 6px 5px; font-size: 9px; }
+    .topbar { gap: 6px; }
+    .topbar h1 { font-size: 12px; }
+    .tabletop-handle { min-height: 32px; }
+    .tabletop-text { padding: 8px 10px 18px; }
+}

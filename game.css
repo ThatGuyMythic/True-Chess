@@ -1,0 +1,1075 @@
+/*
+TRUE CHESS — game.css
+
+CONTENTS
+  1. Theme and shared controls
+  2. Page layout and board sizing
+  3. Tiles, pieces, objects, and status areas
+  4. Right-hand sidebar and inventory
+  5. Main menu artwork
+  6. Floating windows and forms
+  7. Drawing editor and custom wheel
+  8. Context menu and notifications
+  9. Smaller-screen layouts
+
+Colors set by the game:
+  --game-background : saved match background
+  --tile-color      : an individual tile's paint color
+  --status-color    : an object's area / status color
+*/
+
+/* ========================================================================== */
+/* 1. Theme and shared controls                                               */
+/* ========================================================================== */
+
+:root {
+    font-family: "Courier New", ui-monospace, monospace;
+    color: #e6e0cf;
+    background: #111;
+    color-scheme: dark;
+
+    --gold: #e4d39d;
+    --line: #b6b3a43d;
+    --muted: #aaa99f;
+    --blue: #74c9ed;
+    --game-background: #151515;
+}
+
+* {
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    overflow: hidden;
+}
+h1, h2, h3, p {
+    margin: 0;
+}
+
+h3 {
+    margin-bottom: 10px;
+    color: var(--gold);
+    font-size: 12px;
+}
+
+small {
+    color: var(--muted);
+    font-size: 11px;
+}
+button, input, textarea, select {
+    font: inherit;
+}
+[hidden] {
+    display: none !important;
+}
+
+button {
+    padding: 9px 12px;
+    color: inherit;
+    background: #303030;
+    border: 1px solid #8a897c80;
+    box-shadow: inset 1px 1px #ffffff0c, inset -1px -1px #0005;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    background: #44433d;
+    border-color: var(--gold);
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+button.primary {
+    color: #191919;
+    background: var(--gold);
+}
+button.active {
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+/* ========================================================================== */
+/* 2. Page layout and board sizing                                            */
+/* ========================================================================== */
+
+#app {
+    display: grid;
+    grid-template-rows: 58px minmax(0, 1fr) 29px;
+    height: 100dvh;
+    background: var(--game-background);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 0 22px;
+    background: #303030;
+    border-bottom: 1px solid var(--line);
+}
+
+.topbar h1 {
+    font-size: 21px;
+    letter-spacing: 3px;
+}
+.top-actions, .button-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.top-actions button {
+    font-size: 11px;
+}
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    min-height: 0;
+}
+
+.board-column {
+    display: grid;
+    grid-template-rows: 38px minmax(0, 1fr) 28px 48px;
+    min-width: 0;
+    min-height: 0;
+    padding: 14px 24px 10px;
+}
+
+.board-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.board-toolbar button {
+    padding: 5px 9px;
+}
+.board-toolbar .button-row {
+    flex-shrink: 0;
+}
+
+#board-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 20px;
+    overflow: auto;
+}
+
+#board {
+    /* JS supplies explicit equal rows AND columns, and square cell dimensions. */
+    display: grid;
+    flex: none;
+    outline: 4px solid #252525;
+    box-shadow: 0 0 0 6px #77776b, 0 20px 50px #000;
+}
+
+#mode {
+    padding: 6px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 10px;
+}
+
+.bottom-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+}
+.bottom-controls button {
+    font-size: 12px;
+}
+
+.statusbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 7px 22px;
+    color: var(--muted);
+    background: #303030;
+    border-top: 1px solid var(--line);
+    font-size: 9px;
+}
+
+/* ========================================================================== */
+/* 3. Tiles, pieces, objects, and status areas                                 */
+/* ========================================================================== */
+
+.tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    background: var(--tile-color, var(--terrain-base));
+    border: 0;
+    box-shadow: none;
+    isolation: isolate;
+    touch-action: none;
+    user-select: none;
+}
+
+.tile.light {
+    --terrain-base: #b6b3a7;
+}
+.tile.dark {
+    --terrain-base: #585955;
+}
+.tile.hole {
+    --terrain-base: #030303;
+    box-shadow: inset 0 0 14px #000;
+}
+.tile.mountain {
+    --terrain-base: #343431;
+}
+
+/* Hover must not erase custom tile paint. */
+.tile:hover:not(:disabled) {
+    background: var(--tile-color, var(--terrain-base));
+    border: 0;
+}
+
+.tile.tile-picked {
+    box-shadow: inset 0 0 0 2px var(--blue);
+}
+
+/* Area overlays are below piece/object artwork and do not intercept clicks. */
+.status-area {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--status-color, #9b69c8);
+    opacity: .36;
+    pointer-events: none;
+}
+
+.mountain {
+    position: relative;
+    z-index: 1;
+    color: #aaa99f;
+    font-size: clamp(15px, 3vw, 35px);
+    pointer-events: none;
+}
+
+.piece {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 82%;
+    height: 88%;
+    pointer-events: none;
+}
+
+.piece img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(1px 3px 2px #0008);
+}
+
+.piece-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(1px 3px 2px #0008);
+}
+
+.piece.white .piece-svg g {
+    fill: #e7dfc5;
+    stroke: #6b6454;
+}
+.piece.black .piece-svg g {
+    fill: #303033;
+    stroke: #b5b3a7;
+}
+
+/* Only the piece glows when selected; its tile does not. */
+.piece.chosen {
+    filter: drop-shadow(0 0 3px #74c9ed) drop-shadow(0 0 5px #74c9ed);
+}
+
+.shield-count {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1px 3px;
+    color: white;
+    background: #527c99;
+    font-size: 9px;
+}
+
+.drag-source {
+    visibility: hidden;
+}
+.inactive {
+    opacity: .5;
+}
+
+.board-object {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* Collectibles are small bottom-right icons. */
+.board-object.collectible {
+    right: 2%;
+    bottom: 2%;
+    width: 30%;
+    height: 32%;
+    background: #8c7951;
+    border: 1px solid var(--gold);
+}
+
+/* All other objects occupy the center, at approximately piece size. */
+.board-object.centered-object {
+    top: 6%;
+    left: 9%;
+    width: 82%;
+    height: 88%;
+    background: transparent;
+    border: 0;
+}
+
+.board-object img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+#drag-ghost {
+    position: fixed;
+    z-index: 2000;
+    transform-origin: 50% 15%;
+    will-change: transform, left, top;
+    pointer-events: none;
+}
+
+#drag-ghost .piece {
+    width: 100%;
+    height: 100%;
+}
+
+.projectile {
+    position: fixed;
+    z-index: 2100;
+    width: 14px;
+    height: 14px;
+    background: #fff7c8;
+    border-radius: 50%;
+    box-shadow: 0 0 9px 4px #e5c76d, 0 0 20px #ffb833;
+    pointer-events: none;
+}
+
+/* ========================================================================== */
+/* 4. Right-hand sidebar and inventory                                        */
+/* ========================================================================== */
+
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    padding: 15px;
+    overflow: auto;
+    background: #202020b0;
+    border-left: 1px solid var(--line);
+}
+
+#piece-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+#piece-info h2 {
+    margin-bottom: 10px;
+    font-size: 19px;
+    overflow-wrap: anywhere;
+}
+.portrait {
+    width: 72px;
+    height: 78px;
+}
+.portrait .piece {
+    width: 100%;
+    height: 100%;
+}
+
+.description {
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.piece-statuses {
+    margin-top: 15px;
+}
+.status-description {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 9px;
+    font-size: 11px;
+}
+.status-description small {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    line-height: 1.6;
+}
+.status-swatch {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    margin-top: 3px;
+    background: var(--status-color);
+}
+
+#world-actions p {
+    margin: 10px 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+.world-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.world-buttons button {
+    font-size: 11px;
+}
+.terrain-buttons {
+    flex-wrap: wrap;
+}
+.terrain-buttons button {
+    padding: 7px;
+    font-size: 10px;
+}
+.sidebar-bottom {
+    display: grid;
+    gap: 16px;
+    margin-top: auto;
+}
+.captured-box, .inventory-box {
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+
+#captured {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 180px;
+    overflow: auto;
+}
+.captured-piece {
+    width: 35px;
+    height: 41px;
+    padding: 1px;
+    touch-action: none;
+}
+.captured-piece .piece {
+    width: 100%;
+    height: 100%;
+}
+#inventory {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.inventory-slot {
+    height: 66px;
+    padding: 5px;
+    background: #151515;
+    border: 1px solid #807b68;
+}
+.inventory-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+.inventory-slot:disabled {
+    opacity: 1;
+}
+
+/* ========================================================================== */
+/* 5. Main menu artwork                                                       */
+/* ========================================================================== */
+
+#menu {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    display: grid;
+    place-items: center;
+    overflow: auto;
+    background-color: #141414;
+    background-image: linear-gradient(#0005, #0009), url("main-menu.png");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.menu-content {
+    max-width: 750px;
+    padding: 36px 25px;
+    text-align: center;
+    text-shadow: 1px 2px 3px #000;
+}
+
+.eyebrow {
+    margin-bottom: 20px;
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 4px;
+}
+.menu-content h2 {
+    margin-bottom: 25px;
+    color: #e9dfc1;
+    font-size: clamp(35px, 7vw, 70px);
+    letter-spacing: 6px;
+    text-shadow: 4px 4px #000;
+}
+.menu-content > p:not(.eyebrow) {
+    font-size: 13px;
+    line-height: 1.9;
+}
+.menu-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 35px 0 25px;
+}
+.menu-buttons button {
+    min-height: 47px;
+    font-size: 12px;
+    text-shadow: none;
+}
+.menu-buttons button:last-child {
+    grid-column: 1 / -1;
+}
+.menu-note {
+    color: #d0cec5;
+    font-size: 11px !important;
+}
+
+/* ========================================================================== */
+/* 6. Floating windows and forms                                              */
+/* ========================================================================== */
+
+/* This container is transparent to clicks; only the windows receive them. */
+#windows {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.floating-window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: min(570px, calc(100vw - 16px));
+    min-width: 260px;
+    min-height: 140px;
+    max-height: calc(100dvh - 24px);
+    overflow: hidden;
+    resize: both;
+    background: #292929;
+    border: 2px solid #a19c86;
+    box-shadow: 7px 7px #0009;
+    pointer-events: auto;
+}
+
+.floating-window.wide {
+    width: min(850px, calc(100vw - 16px));
+}
+
+.window-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #343434;
+    cursor: move;
+    touch-action: none;
+}
+
+.window-header h2 {
+    font-size: 17px;
+    pointer-events: none;
+}
+.window-header button {
+    padding: 1px 7px;
+    font-size: 22px;
+}
+.window-body {
+    min-height: 0;
+    padding: 18px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.7;
+}
+.window-body > p {
+    margin-bottom: 14px;
+}
+.window-body label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #d4cbb6;
+    font-size: 11px;
+}
+.window-footer {
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #343434;
+}
+.window-footer button {
+    font-size: 11px;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.full, .field.full {
+    grid-column: 1 / -1;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+input, textarea, select {
+    min-width: 0;
+    width: 100%;
+    padding: 9px;
+    color: inherit;
+    background: #141414;
+    border: 1px solid #8b887680;
+    font-size: 12px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.toggle {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    line-height: 1.6;
+}
+
+.toggle input {
+    width: auto;
+    accent-color: var(--gold);
+}
+.color-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+.color-field input[type="color"] {
+    width: 100%;
+    height: 38px;
+    padding: 3px;
+    cursor: pointer;
+}
+.field-error {
+    margin-top: 12px;
+    color: #ec9c88;
+    font-size: 11px;
+}
+.modal-subtitle {
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+.agreement-note {
+    margin: 10px 0;
+    color: var(--gold);
+    font-size: 11px;
+}
+.object-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* ========================================================================== */
+/* 7. Drawing editor and custom wheel                                         */
+/* ========================================================================== */
+
+.drawing-layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr);
+    align-items: start;
+    gap: 20px;
+}
+.draw-canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    background: repeating-conic-gradient(#353535 0% 25%, #292929 0% 50%) 50% / 20px 20px;
+    border: 1px solid var(--line);
+    touch-action: none;
+    image-rendering: pixelated;
+}
+.drawing-side > small {
+    display: block;
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.7;
+}
+.drawing-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 9px 0;
+}
+.drawing-tools input[type="color"] {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+.drawing-tools input[type="range"] {
+    width: 65px;
+    padding: 0;
+}
+.drawing-tools button {
+    padding: 6px;
+    font-size: 10px;
+}
+.upload-button {
+    padding: 10px;
+    border: 1px dashed var(--line);
+    text-align: center;
+    cursor: pointer;
+}
+.upload-button input {
+    display: none;
+}
+.wheel-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.wheel-stage {
+    position: relative;
+    min-width: 0;
+}
+.wheel-canvas {
+    display: block;
+    width: 100%;
+}
+.wheel-pointer {
+    position: absolute;
+    top: -6px;
+    left: calc(50% - 8px);
+    z-index: 2;
+    color: #fff;
+    font-size: 24px;
+    text-shadow: 1px 2px #000;
+}
+.wheel-rows {
+    display: grid;
+    gap: 5px;
+    max-height: 310px;
+    overflow: auto;
+}
+.wheel-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 75px 30px;
+    gap: 5px;
+}
+.wheel-row button {
+    padding: 2px;
+}
+.wheel-result {
+    margin-top: 12px;
+    color: var(--gold);
+    text-align: center;
+    font-size: 17px;
+}
+.add-category {
+    margin-top: 8px;
+    font-size: 11px;
+}
+
+/* ========================================================================== */
+/* 8. Context menu and notifications                                          */
+/* ========================================================================== */
+
+#context-menu {
+    position: fixed;
+    z-index: 2200;
+    width: 160px;
+    padding: 5px;
+    background: #292929;
+    border: 1px solid var(--gold);
+    box-shadow: 4px 4px #0008;
+}
+#context-menu button {
+    display: block;
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+    text-align: left;
+    font-size: 12px;
+}
+
+#toast {
+    position: fixed;
+    bottom: 42px;
+    left: 50%;
+    z-index: 3000;
+    display: none;
+    max-width: min(650px, 90vw);
+    padding: 12px 17px;
+    transform: translateX(-50%);
+    color: #eee8d6;
+    background: #33372d;
+    border: 1px solid #b3b59b;
+    font-size: 12px;
+    line-height: 1.6;
+    pointer-events: none;
+}
+
+#toast.visible {
+    display: block;
+}
+#toast.error {
+    color: #ffc4b3;
+    border-color: #c37e6b;
+}
+
+/* ========================================================================== */
+/* 9. Smaller-screen layouts                                                  */
+/* ========================================================================== */
+
+@media (max-width: 900px) {
+    .workspace {
+        grid-template-columns: minmax(0, 1fr) 230px;
+    }
+    .board-column {
+        padding: 10px 13px;
+    }
+    .right-panel {
+        padding: 12px;
+    }
+    .board-toolbar {
+        font-size: 10px;
+    }
+    .topbar {
+        padding: 0 14px;
+    }
+    .statusbar {
+        padding: 7px 12px;
+    }
+    .statusbar span:last-child {
+        display: none;
+    }
+}
+
+@media (max-width: 650px) {
+    #app {
+        grid-template-rows: 50px minmax(0, 1fr) 27px;
+    }
+    .topbar {
+        padding: 0 10px;
+    }
+    .topbar h1 {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+    .top-actions {
+        gap: 4px;
+    }
+    .top-actions button {
+        padding: 7px;
+        font-size: 9px;
+    }
+    .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) 220px;
+    }
+    .board-column {
+        grid-template-rows: 32px minmax(0, 1fr) 24px 40px;
+        padding: 5px 10px;
+    }
+
+    .right-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 160px;
+        gap: 12px;
+        padding: 8px;
+        overflow: auto;
+        border-top: 1px solid var(--line);
+        border-left: 0;
+    }
+
+    .sidebar-bottom {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        margin: 0;
+    }
+    #piece-info {
+        display: block;
+        grid-column: 1;
+        padding-bottom: 5px;
+    }
+    .portrait {
+        float: left;
+        width: 42px;
+        height: 46px;
+        margin-right: 8px;
+    }
+    #piece-info h2 {
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+    #piece-info .description {
+        max-height: 65px;
+        overflow: auto;
+        font-size: 10px;
+    }
+    .piece-statuses {
+        clear: both;
+        padding-top: 8px;
+    }
+    .status-description {
+        font-size: 10px;
+    }
+    .status-description small {
+        font-size: 9px;
+    }
+    #world-actions {
+        grid-column: 1;
+    }
+    h3 {
+        margin-bottom: 6px;
+        font-size: 10px;
+    }
+    .world-buttons {
+        gap: 5px;
+    }
+    .world-buttons button {
+        padding: 6px;
+        font-size: 9px;
+    }
+    .inventory-slot {
+        height: 42px;
+        padding: 3px;
+    }
+    #inventory {
+        gap: 5px;
+    }
+    #captured {
+        max-height: 70px;
+    }
+    .captured-piece {
+        width: 27px;
+        height: 32px;
+    }
+    .captured-box, .inventory-box {
+        padding-top: 6px;
+    }
+    .board-toolbar .button-row {
+        gap: 4px;
+    }
+    .board-toolbar button {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+    #mode {
+        padding: 3px;
+        font-size: 8px;
+    }
+    .bottom-controls button {
+        padding: 7px;
+        font-size: 10px;
+    }
+    .drawing-layout, .wheel-layout {
+        grid-template-columns: 1fr;
+    }
+    .draw-canvas {
+        max-width: 250px;
+        margin: auto;
+    }
+    .drawing-side {
+        width: 100%;
+        max-width: 270px;
+        margin: auto;
+    }
+    .floating-window {
+        max-height: calc(100dvh - 12px);
+    }
+    .window-body {
+        padding: 12px;
+    }
+    .wheel-canvas {
+        max-width: 230px;
+        margin: auto;
+    }
+    .menu-buttons {
+        gap: 8px;
+    }
+    .menu-buttons button {
+        font-size: 10px;
+    }
+    .menu-content {
+        padding: 20px;
+    }
+}

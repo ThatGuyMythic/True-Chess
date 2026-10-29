@@ -1,0 +1,16 @@
+{
+  "name": "true-chess-online",
+  "version": "1.0.0",
+  "private": true,
+  "description": "True Chess website and authoritative multiplayer rooms",
+  "scripts": {
+    "start": "node server.cjs",
+    "check": "node --check server.cjs && node --check engine.cjs && node --check render-online.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}

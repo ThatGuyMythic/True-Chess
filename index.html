@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>True Chess</title>
+<link rel="stylesheet" href="game.css">
+<script src="index.js" defer></script>
+</head>
+<body>
+<div id="app">
+<header class="topbar"><h1>TRUE CHESS</h1><div class="top-actions"><button data-action="room-info">Room info</button><button data-action="wheel">Wheel</button><button data-action="menu">Menu</button></div></header>
+<main class="workspace">
+<section class="board-column">
+<div class="board-toolbar"><span id="turn"></span><div class="button-row"><button data-action="zoom-out" aria-label="Zoom out">−</button><span id="zoom-value">85%</span><button data-action="zoom-in" aria-label="Zoom in">+</button><button data-action="zoom-fit">Fit</button></div></div>
+<div id="board-stage"><div id="board" role="group" aria-label="True Chess board"></div></div>
+<div id="mode"></div>
+<div class="bottom-controls"><button data-action="edit">Edit</button><button data-action="undo">Undo</button><button id="end-turn" class="primary" data-action="end-turn">End turn early</button></div>
+</section>
+<aside class="right-panel"><section id="piece-info"></section><section id="world-actions"></section><div class="sidebar-bottom"><section class="captured-box"><h3>Captured pieces</h3><div id="captured"></div></section><section class="inventory-box"><h3>Inventory</h3><div id="inventory"></div></section></div></aside>
+</main>
+<footer class="statusbar"><span id="connection">LOCAL</span><span>Right-click → actions · Ctrl+Z → undo</span></footer>
+</div>
+<section id="menu" aria-label="Main menu"><div class="menu-content"><p class="eyebrow">DRAW YOUR OWN DESTINY</p><h2>TRUE CHESS</h2><p>A familiar board. Your own creations.<br>Two players. One extraordinary battle.</p><div class="menu-buttons"><button class="primary" data-action="local">Local · start / continue</button><button data-action="reset-local">Reset local match</button><button data-action="create-room">Create two-tab room</button><button data-action="join-room">Join by code</button><button id="back-to-game">Back to board</button></div><p class="menu-note">Two-tab rooms work in the same browser profile and on the same site.<br>They are not internet rooms for separate computers.</p></div></section>
+<div id="windows"></div><div id="toast" role="status"></div>
+<noscript>This game needs JavaScript enabled.</noscript>
+</body>
+</html>
